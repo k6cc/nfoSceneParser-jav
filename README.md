@@ -12,7 +12,40 @@ https://discourse.stashapp.cc/t/nfosceneparser/1385
 
 # 安装
 
-> **前置依赖**：安装 Python 模块 `pip install requests`（或 `pip3 install requests`，取决于你的 Python 配置）。**注意：如果你在 Docker 容器中运行 Stash，则无需安装，`requests` 已预装。**
+## 前置依赖
+
+本插件为 Python 后端插件（非纯前端 JS 插件），运行需要：
+
+| 组件 | 必需 | 说明 |
+|------|------|------|
+| **Python 3.x** | ✅ | 插件执行器（`exec: python`） |
+| **requests 库** | ✅ | 调用 Stash GraphQL API |
+| **Stash** | ✅ | 提供 GraphQL 端点 |
+
+**Docker 部署**：Stash 官方镜像已预装 Python 和 requests，无需额外操作。
+
+**Windows / macOS 裸机部署**：需手动安装。在 PowerShell（Windows）或终端（macOS）执行以下命令验证：
+
+```powershell
+python --version                  # 应输出 Python 3.x.x
+python -c "import requests; print(requests.__version__)"   # 应输出 requests 版本号
+```
+
+若任一报错，按以下顺序安装：
+
+```powershell
+# Windows（winget）
+winget install Python.Python.3.12
+pip install requests
+
+# macOS（homebrew）
+brew install python@3.12
+pip3 install requests
+```
+
+> **注意**：`pip` 或 `pip3` 取决于你的 Python 配置。安装后可能需要重新打开终端使 `python` 命令生效。
+
+---
 
 ## 方式一：通过 Stash 插件源安装（推荐）
 
