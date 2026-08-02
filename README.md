@@ -12,12 +12,45 @@ https://discourse.stashapp.cc/t/nfosceneparser/1385
 
 # 安装
 
-- 安装所需的 Python 模块：`pip install requests`（或 `pip3 install requests`，取决于你的 Python 配置）。**注意：如果你在 Docker 容器中运行 Stash，则无需安装，`requests` 已预装。**
-- 下载整个 `nfoSceneParser` 文件夹
-- 放入你的 `plugins` 文件夹（`config.yml` 所在目录）
+> **前置依赖**：安装 Python 模块 `pip install requests`（或 `pip3 install requests`，取决于你的 Python 配置）。**注意：如果你在 Docker 容器中运行 Stash，则无需安装，`requests` 已预装。**
+
+## 方式一：通过 Stash 插件源安装（推荐）
+
+在 **Stash → 设置 → 插件 → 可用插件 → 添加源** 中添加以下 URL：
+
+```
+https://k6cc.github.io/binge-cn/plugins/main/index.yml
+```
+
+> 此 URL 同时包含 Binge 和 nfoSceneParser 两个插件，可一并安装。
+
+然后从列表中安装 **nfoSceneParser**。
+
+安装完成后：
 - 重新加载插件（`设置 > 插件 > 重新加载`）
-- `nfoSceneParser` 出现
-- 扫描一些新文件...
+- `nfoSceneParser` 出现在插件列表
+- 扫描一些新文件即可自动触发
+
+## 方式二：下载 Release 手动安装
+
+1. 前往 [Releases 页面](https://github.com/k6cc/nfoSceneParser-jav/releases)
+2. 下载最新版本的 `nfoSceneParser-vX.Y.Z.zip`
+3. 解压到 Stash 插件目录（zip 内文件直接放在 `nfoSceneParser` 目录下，不要嵌套子目录）：
+   - **Windows**: `%USERPROFILE%\.stash\plugins\nfoSceneParser\`
+   - **Linux/macOS**: `~/.stash/plugins/nfoSceneParser/`
+4. Stash → 设置 → 插件 → 重新加载插件
+
+## 方式三：从源码构建
+
+```bash
+git clone https://github.com/k6cc/nfoSceneParser-jav.git nfoSceneParser
+# 将整个目录复制到 Stash 插件目录
+# Windows: copy to %USERPROFILE%\.stash\plugins\
+# Linux/macOS: cp -r nfoSceneParser ~/.stash/plugins/
+# 然后：Stash → 设置 → 插件 → 重新加载插件
+```
+
+---
 
 插件会在每次创建新场景时自动触发（通常在扫描期间）。
 
