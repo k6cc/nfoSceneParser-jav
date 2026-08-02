@@ -1,0 +1,19 @@
+id: nfoSceneParser
+name: nfoSceneParser
+metadata:
+  description: Fills scene data from NFO or filename pattern
+version: 1.5.0
+date: "2026-08-03 00:00:00"
+requires: []
+source_repository: https://github.com/k6cc/nfoSceneParser-jav
+files:
+- nfoParser.py
+- nfoSceneParser.py
+- stashInterface.py
+- nfoSceneParser.yml
+- config.py
+- README.md
+- log.py
+- reParser.py
+- abstractParser.py
+- NFO字段对照表.md
