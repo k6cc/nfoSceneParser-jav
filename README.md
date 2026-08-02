@@ -52,10 +52,10 @@ pip3 install requests
 在 **Stash → 设置 → 插件 → 可用插件 → 添加源** 中添加以下 URL：
 
 ```
-https://k6cc.github.io/binge-cn/plugins/main/index.yml
+https://k6cc.github.io/stash-plugins/plugins/main/index.yml
 ```
 
-> 此 URL 同时包含 Binge 和 nfoSceneParser 两个插件，可一并安装。
+> 此 URL 是统一插件源，包含 Binge、nfoSceneParser、sceneTranslate、sceneGallerySync、studioMerge、studioSearch 等多个插件，可一并安装。
 
 然后从列表中安装 **nfoSceneParser**。
 
