@@ -180,6 +180,59 @@ class NfoParser(AbstractParser):
                     f"data:image/jpeg;base64,{thumb_b64img.decode('utf-8')}")
         return file_images
 
+    def __read_movie_cover_images(self):
+        # Movie 专用正反封面搜索，与场景封面逻辑（__read_cover_image_file）完全独立。
+        # basename 与搜索目录均与 __read_cover_image_file 保持一致（基于 NFO 文件路径），
+        # 确保两者互不干扰；本方法不使用 glob/数字后缀，仅精确匹配用户指定文件名。
+        # 受 config.blacklist 中的 "cover_image" 控制，与场景封面一致。
+        if "cover_image" in config.blacklist:
+            return (None, None)
+        if not self._nfo_file:
+            return (None, None)
+        # 与 __read_cover_image_file() 使用相同的 basename 和目录来源
+        path_no_ext = os.path.splitext(self._nfo_file)[0]
+        file_no_ext = os.path.split(path_no_ext)[1]
+        path_dir = os.path.dirname(self._nfo_file)
+        img_exts = (".jpg", ".jpeg", ".png", ".webp")
+
+        def __find_image(candidates):
+            # candidates: [(dir, filename_without_ext), ...] 按优先级排序
+            for dir_path, file_base in candidates:
+                for ext in img_exts:
+                    img_path = os.path.join(dir_path, f"{file_base}{ext}")
+                    if os.path.isfile(img_path):
+                        try:
+                            with open(img_path, "rb") as img:
+                                return img.read()
+                        except OSError:
+                            continue
+            return None
+
+        # 正面图：场景级 {basename}-poster > 文件夹级 folder
+        front_image = __find_image([
+            (path_dir, f"{file_no_ext}-poster"),
+            (path_dir, "folder"),
+        ])
+        # 背面图：场景级 fanart > landscape > thumb > 文件夹级 landscape > backdrop
+        back_image = __find_image([
+            (path_dir, f"{file_no_ext}-fanart"),
+            (path_dir, f"{file_no_ext}-landscape"),
+            (path_dir, f"{file_no_ext}-thumb"),
+            (path_dir, "landscape"),
+            (path_dir, "backdrop"),
+        ])
+        return (front_image, back_image)
+
+    def __extract_movie_cover_images_b64(self):
+        # 编码 Movie 专用封面为 base64 data URL，与场景封面逻辑独立。
+        front_bytes, back_bytes = self.__read_movie_cover_images()
+        front_b64 = back_b64 = None
+        if front_bytes:
+            front_b64 = f"data:image/jpeg;base64,{base64.b64encode(front_bytes).decode('utf-8')}"
+        if back_bytes:
+            back_b64 = f"data:image/jpeg;base64,{base64.b64encode(back_bytes).decode('utf-8')}"
+        return (front_b64, back_b64)
+
     def __extract_nfo_rating(self):
         multiplier = getattr(config, "user_rating_multiplier", 1)
         user_rating = round(float(self._nfo_root.findtext(getattr(config, "user_rating_field", "userrating")) or 0) * multiplier)
@@ -253,6 +306,8 @@ class NfoParser(AbstractParser):
             return {}
         # Extract data from XML tree. Spec: https://kodi.wiki/view/NFO_files/Movies
         b64_images = self.__extract_cover_images_b64()
+        # Movie 专用封面（独立于场景封面 cover_image/other_image）
+        movie_front_b64, movie_back_b64 = self.__extract_movie_cover_images_b64()
         file_data = {
             # TODO: supports stash uniqueid to match to existing scenes (compatibility with nfo exporter)
             "file": self._nfo_file,
@@ -271,6 +326,9 @@ class NfoParser(AbstractParser):
             "rating": self.__extract_nfo_rating() or self._get_default("rating"),
             "cover_image": None if len(b64_images) < 1 else b64_images[0],
             "other_image": None if len(b64_images) < 2 else b64_images[1],
+            # Movie 专用封面（不影响场景封面）
+            "movie_front_image": movie_front_b64,
+            "movie_back_image": movie_back_b64,
             # Below are NFO extensions or liberal tag interpretations (not part of the nfo spec)
             "movie": self._nfo_root.findtext("set/name") or self.__get_multipart_movie_name(),
             "base_name": self.__get_multipart_base_name(),

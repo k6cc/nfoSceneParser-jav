@@ -1,5 +1,7 @@
 # nfoSceneParser
 
+> 当前版本 **v1.6.0**（fork 自社区原版，新增 Movie 正反封面搜索等增强功能）
+
 > ⚠️ **冲突警告**：本插件为社区原版 [nfoSceneParser](https://github.com/stashapp/CommunityScripts/tree/main/plugins/nfoSceneParser) 的 fork 版本，**不可与原版同时安装**。如已安装原版，请先卸载原版后再安装本版本，否则会造成插件冲突。
 
 https://discourse.stashapp.cc/t/nfosceneparser/1385
@@ -292,6 +294,27 @@ folder.nfo 示例：
   </set>
 </movie>
 ```
+
+### Movie 正反封面搜索（v1.6.0 新增）
+
+创建 Movie 时，按以下优先级**独立搜索正反封面**（与场景封面 `cover_image`/`other_image` 逻辑完全独立，互不干扰）：
+
+| | 优先级 | 文件名 |
+|---|---|---|
+| **正面图** | 1（场景级） | `{basename}-poster.{ext}` |
+| | 2（文件夹级） | `folder.{ext}` |
+| **背面图** | 1（场景级） | `{basename}-fanart.{ext}` |
+| | 2（场景级） | `{basename}-landscape.{ext}` |
+| | 3（场景级） | `{basename}-thumb.{ext}` |
+| | 4（文件夹级） | `landscape.{ext}` |
+| | 5（文件夹级） | `backdrop.{ext}` |
+
+- `{basename}` = NFO 文件名去扩展名（与场景封面 `__read_cover_image_file()` 一致）
+- 支持扩展名：`.jpg` / `.jpeg` / `.png` / `.webp`
+- 受 `config.blacklist` 中的 `"cover_image"` 控制（与场景封面一致）
+- 仅在 Movie 创建时设置；已存在的 Movie 不会被更新（需用 `reset-movie-covers` 工具重设）
+
+**向后兼容**：若新字段未找到，回退到旧的 `cover_image`/`other_image` 字段，行为与 v1.5.0 一致。
 
 ## URL 支持
 

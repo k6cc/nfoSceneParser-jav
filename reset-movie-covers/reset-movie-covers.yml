@@ -1,0 +1,13 @@
+name: 重设合集封面
+description: 遍历所有合集(Movie)，按文件名规则从关联 Scene 目录重设正反封面
+version: 1.0.0
+url: ""
+exec:
+  - python
+  - "{pluginDir}/reset-movie-covers.py"
+interface: raw
+tasks:
+  - name: "重设所有合集封面"
+    description: 遍历所有 Movie，按优先级搜索 {basename}-poster / folder 等，调用 movieUpdate 重置封面
+    defaultArgs:
+      mode: reset

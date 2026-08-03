@@ -252,8 +252,8 @@ class StashInterface:
                 "synopsis": (folder_data.get("details") or file_data.get("details") or None) if "details" not in bl else None,
                 "rating100": (folder_data.get("rating") or file_data.get("rating") or None) if "rating" not in bl else None,
                 "url": ((folder_data.get("urls") or file_data.get("urls") or [None])[0] or None) if "urls" not in bl else None,
-                "front_image": (folder_data.get("cover_image") or file_data.get("cover_image")) if "cover_image" not in bl else None,
-                "back_image": (folder_data.get("other_image") or file_data.get("other_image")) if "cover_image" not in bl else None,
+                "front_image": (folder_data.get("movie_front_image") or file_data.get("movie_front_image") or folder_data.get("cover_image") or file_data.get("cover_image")) if "cover_image" not in bl else None,
+                "back_image": (folder_data.get("movie_back_image") or file_data.get("movie_back_image") or folder_data.get("other_image") or file_data.get("other_image")) if "cover_image" not in bl else None,
             }
         }
         result = self.__gql_call(query, variables)

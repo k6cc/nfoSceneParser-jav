@@ -140,6 +140,9 @@ class RegExParser(AbstractParser):
             "rating": self.__extract_re_rating() or self._get_default("rating"),
             "cover_image": None,
             "other_image": None,
+            # Movie 专用封面（re 解析器不提供，保持字段一致）
+            "movie_front_image": None,
+            "movie_back_image": None,
             "urls": None,
         }
         return file_data
