@@ -51,9 +51,9 @@ Stash Hook 触发
 | `details` | `<plot>` | `<plot>` → `<outline>` → `<tagline>` | nfoParser.py |
 | `studio` | `<studio>` | 直接对应（单值） | nfoParser.py |
 | `performers` | `<actor><name>` | 所有 `<actor><name>` 子元素（合并去重） | nfoParser.py |
-| `movie` | `<set><name>` | `<set/name>` → 有兄弟文件时用文件名前缀 | nfoParser.py |
+| `movie` | `<set><name>` / `<series>` / `<set>` 直文本 | `<set/name>` → `<series>` → `<set>`直文本 → 文件名前缀 | nfoParser.py |
 | `scene_index` | `<set><index>` | `<set/index>` → 仅 CD 式后缀有自动排序（int 类型） | nfoParser.py |
-| `rating` (0-100) | `<userrating>` 或 `<ratings>` | `<userrating>` → `<ratings/rating>` | nfoParser.py |
+| `rating` (0-100) | `<userrating>` / `<ratings>` / `<rating>` | `<userrating>` → `<ratings/rating>` → `<rating>`直文本 | nfoParser.py |
 | `tags` | `<tag>` + `<genre>` | 同时读取，去重合并 | nfoParser.py |
 | `date` | `<premiered>` | `<premiered>` → `<year>` | nfoParser.py |
 | `urls` | `<url>` + `<website>` | 多个标签合并为数组 | nfoParser.py |
@@ -85,6 +85,7 @@ Stash Hook 触发
 |---------|---------|-------|
 | `<userrating>` | 直接取值 × `user_rating_multiplier`，换算到 0-100 | `user_rating_field`、`user_rating_multiplier` |
 | `<ratings/rating>` | `value / max × 100`（换算到 0-100） | 无 |
+| `<rating>`（直文本） | `value / max × 100`，默认 `max=5`（换算到 0-100） | 无 |
 
 ---
 
@@ -274,8 +275,10 @@ Stash Hook 触发
 | 条件 | movie 名来源 | 示例 |
 |------|------------|------|
 | NFO 有 `<set><name>` | 直接取 `<set/name>` 值 | `<set><name>S1 GIRLS COLLECTION</name></set>` → `S1 GIRLS COLLECTION` |
+| NFO 有 `<series>` | 取 `<series>` 值（`<set/name>` 缺失时） | `<series>科幻</series>` → `科幻` |
+| NFO 有 `<set>` 直文本 | 取 `<set>` 文本（前两者缺失时） | `<set>动作</set>` → `动作` |
 | 有兄弟文件 | NFO `<title>` > 文件名前缀 | 先处理的文件决定 Movie 名 |
-| 无兄弟文件且无 `<set/name>` | 不创建 Movie | `ABC-123-4k.mp4`（单独） → 无 Movie |
+| 无兄弟文件且无 `<set/name>`/`<series>`/`<set>` | 不创建 Movie | `ABC-123-4k.mp4`（单独） → 无 Movie |
 
 ### Movie 关联搜索（先到先得）
 

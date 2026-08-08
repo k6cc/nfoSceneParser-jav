@@ -246,6 +246,16 @@ class NfoParser(AbstractParser):
             value = float(rating_elem.findtext("value") or 0)
             # ratings on scale 100 (since stashapp v24)
             rating = round(value / max_value * 100)
+        # 兼容 <rating>4.51</rating> 形式（默认 5 分制，换算到 0-100）
+        if rating is None:
+            direct_elem = self._nfo_root.find("rating")
+            if direct_elem is not None and direct_elem.text:
+                try:
+                    value = float(direct_elem.text)
+                    max_value = float(direct_elem.attrib.get("max", "5") or "5")
+                    rating = round(value / max_value * 100)
+                except (ValueError, TypeError):
+                    pass
         return rating
 
     def __extract_nfo_date(self):
@@ -330,7 +340,10 @@ class NfoParser(AbstractParser):
             "movie_front_image": movie_front_b64,
             "movie_back_image": movie_back_b64,
             # Below are NFO extensions or liberal tag interpretations (not part of the nfo spec)
-            "movie": self._nfo_root.findtext("set/name") or self.__get_multipart_movie_name(),
+            "movie": self._nfo_root.findtext("set/name") \
+            or (self._nfo_root.findtext("series") or "").strip() \
+            or (self._nfo_root.findtext("set") or "").strip() \
+            or self.__get_multipart_movie_name(),
             "base_name": self.__get_multipart_base_name(),
             "title_suffix": self.__get_scene_title_suffix(),
             "scene_index": self.__parse_scene_index(),

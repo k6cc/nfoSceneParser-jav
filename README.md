@@ -1,6 +1,6 @@
 # nfoSceneParser
 
-> 当前版本 **v1.6.0**（fork 自社区原版，新增 Movie 正反封面搜索等增强功能）
+> 当前版本 **v1.6.1**（fork 自社区原版，新增 Movie 正反封面搜索、`<series>`/`<set>`/`<rating>` 直文本识别等增强功能）
 
 > ⚠️ **冲突警告**：本插件为社区原版 [nfoSceneParser](https://github.com/stashapp/CommunityScripts/tree/main/plugins/nfoSceneParser) 的 fork 版本，**不可与原版同时安装**。如已安装原版，请先卸载原版后再安装本版本，否则会造成插件冲突。
 
@@ -198,8 +198,10 @@ folder.nfo 也用于创建影片（Movie）。详见下方影片支持说明。
 | 条件 | 影片名来源 | 示例 |
 |------|-----------|------|
 | NFO 有 `<set><name>` | 直接取 `<set/name>` 值 | `<set><name>ABP系列</name></set>` → `ABP系列` |
+| NFO 有 `<series>` | 取 `<series>` 值（`<set/name>` 缺失时） | `<series>科幻</series>` → `科幻` |
+| NFO 有 `<set>` 直文本 | 取 `<set>` 文本（前两者缺失时） | `<set>动作</set>` → `动作` |
 | 有兄弟文件 | NFO `<title>` > 文件名前缀 | 先处理的文件决定 Movie 名 |
-| 无兄弟文件且无 `<set/name>` | 不创建 Movie | `ABC-123-4k.mp4`（单独） → 无 Movie |
+| 无兄弟文件且无 `<set/name>`/`<series>`/`<set>` | 不创建 Movie | `ABC-123-4k.mp4`（单独） → 无 Movie |
 
 **先到先得**：第一个处理的文件确定 Movie 名，后续文件通过搜索（base_name）找到已有 Movie 并关联。
 
@@ -328,9 +330,9 @@ NFO 规范未正式支持 `<url>` 标签，但鉴于 URL 对 Stash 的重要性�
 | `details` | `plot` 或 `outline` 或 `tagline` | 按优先级顺序 |
 | `studio` | `studio` | 单值 |
 | `performers` | `actor.name` | 合并去重 |
-| `movie` | `set.name` 或文件名前缀 | 有兄弟文件时使用文件名前缀创建 Movie |
+| `movie` | `set.name` / `series` / `set` 直文本 / 文件名前缀 | 按优先级顺序；有兄弟文件时使用文件名前缀创建 Movie |
 | `scene_index` | `set.index` | 仅 CD 式后缀有自动排序；其他后缀为 None |
-| `rating` | `userrating` 或 `ratings.rating` | 换算到 0-100 |
+| `rating` | `userrating` / `ratings.rating` / `rating` 直文本 | 按优先级顺序，换算到 0-100；`<rating>` 直文本默认 `max=5` |
 | `tags` | `tag` 或 `genre` | 合并去重 |
 | `date` | `premiered` 或 `year` | 按优先级顺序 |
 | `urls` | `url` + `website` | 多个标签合并为数组 |
