@@ -1,7 +1,7 @@
 name: nfoSceneParser
 description: Fills scene data from NFO or filename pattern
-version: 1.6.0
-url: https://discourse.stashapp.cc/t/nfosceneparser/1385
+version: 1.6.2
+url: https://github.com/k6cc/nfoSceneParser-jav
 exec:
   - python
   - "{pluginDir}/nfoSceneParser.py"

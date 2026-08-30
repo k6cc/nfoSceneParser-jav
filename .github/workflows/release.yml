@@ -1,7 +1,7 @@
 name: release
 
 # 发布 nfoSceneParser 插件：
-#   1. 打包 zip（插件 .py + .yml + manifest）
+#   1. 打包 zip（插件 .py + .yml）
 #   2. 计算 sha256 + 北京时间戳 + 下载 URL
 #   3. clone stash-plugins 仓库 → awk 更新 index.yml → push
 #   4. 创建 GitHub Release（上传 zip）
@@ -38,8 +38,7 @@ jobs:
             config.py \
             log.py \
             reParser.py \
-            stashInterface.py \
-            manifest
+            stashInterface.py
 
       - name: Compute metadata
         id: meta

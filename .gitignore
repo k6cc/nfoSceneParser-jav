@@ -6,6 +6,7 @@ __pycache__/
 
 # Stash 插件运行时
 .sgs_pending/
+manifest
 
 # 打包产物
 *.zip

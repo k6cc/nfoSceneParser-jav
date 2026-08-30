@@ -1,6 +1,6 @@
 # nfoSceneParser
 
-> 当前版本 **v1.6.1**（fork 自社区原版，新增 Movie 正反封面搜索、`<series>`/`<set>`/`<rating>` 直文本识别等增强功能）
+> 当前版本 **v1.6.2**（fork 自社区原版，新增 Movie 正反封面搜索、`<series>`/`<set>`/`<rating>` 直文本识别等增强功能）
 
 > ⚠️ **冲突警告**：本插件为社区原版 [nfoSceneParser](https://github.com/stashapp/CommunityScripts/tree/main/plugins/nfoSceneParser) 的 fork 版本，**不可与原版同时安装**。如已安装原版，请先卸载原版后再安装本版本，否则会造成插件冲突。
 
