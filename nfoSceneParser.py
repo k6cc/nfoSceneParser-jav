@@ -365,6 +365,25 @@ class NfoSceneParser:
                     if new_tag:
                         created_tags.append(file_tag)
                         tag_ids.append(new_tag["id"])
+                    else:
+                        # Create-fallback: a Tag.Create.Post hook (e.g. tagMergeAuto)
+                        # may have merged the brand-new tag into a canonical one before
+                        # the mutation response returned; the source name now lives in
+                        # the destination's aliases. Re-pull all tags and match name OR
+                        # alias, exactly like javstashAutofill+ v1.2.4.
+                        all_tags = self._stash.gql_findTags()
+                        for tag in (all_tags or {}).get("tags", []):
+                            if self.__is_matching(file_tag, tag["name"], True):
+                                tag_ids.append(tag["id"])
+                                log.LogDebug(
+                                    f"tag '{file_tag}' resolved to canonical '{tag['name']}' via create-fallback")
+                                break
+                            for alias in (tag.get("aliases") or []):
+                                if self.__is_matching(file_tag, alias, True):
+                                    tag_ids.append(tag["id"])
+                                    log.LogDebug(
+                                        f"tag '{file_tag}' resolved to canonical '{tag['name']}' via create-fallback (alias)")
+                                    break
             else:
                 tag_ids.append(matching_id)
                 log.LogDebug(

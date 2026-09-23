@@ -1,6 +1,6 @@
 # nfoSceneParser
 
-> 当前版本 **v1.6.2**（fork 自社区原版，新增 Movie 正反封面搜索、`<series>`/`<set>`/`<rating>` 直文本识别等增强功能）
+> 当前版本 **v1.7.0**（新增 tag 创建失败后「立即再查」兜底：被 tagMergeAuto 等 Tag.Create.Post 钩子合并的新 tag 不再静默丢失，对齐 javstashAutofill+ v1.2.4）
 
 > ⚠️ **冲突警告**：本插件为社区原版 [nfoSceneParser](https://github.com/stashapp/CommunityScripts/tree/main/plugins/nfoSceneParser) 的 fork 版本，**不可与原版同时安装**。如已安装原版，请先卸载原版后再安装本版本，否则会造成插件冲突。
 
@@ -341,6 +341,10 @@ NFO 规范未正式支持 `<url>` 标签，但鉴于 URL 对 Stash 的重要性�
 | `code` | `uniqueid` 或 `num` 或 `sorttitle` | 按优先级顺序 |
 
 注意：`uniqueid` 支持仅用于之前已导出的 Stash 场景（以便用现有 ID "原地"更新）
+
+### tag 创建失败兜底（v1.7.0 新增）
+
+创建缺失 tag 时，若 `tagCreate` 因 `Tag.Create.Post` 钩子（如 tagMergeAuto）在响应返回前将新 tag 合并进规范 tag 而返回空，插件会**立即重拉全量 tag**，按名称/别名匹配到规范 tag 并直接关联其 id，避免新 tag 静默丢失。该重拉仅发生在创建失败路径，正常导入的查询开销不变（对齐 javstashAutofill+ v1.2.4）。
 
 ## XML 容错处理
 

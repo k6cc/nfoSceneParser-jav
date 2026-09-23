@@ -1,6 +1,6 @@
 name: nfoSceneParser
 description: Fills scene data from NFO or filename pattern
-version: 1.6.2
+version: 1.7.0
 url: https://github.com/k6cc/nfoSceneParser-jav
 exec:
   - python
