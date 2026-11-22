@@ -1,6 +1,6 @@
 # nfoSceneParser
 
-> 当前版本 **v1.7.1**（修复无文件场景报 IndexError / `exit status 1`：stashDiscover、binge 这类只写元数据的场景没有文件，插件现在直接跳过）
+> 当前版本 **v1.7.2**（等合并的临时场景跳过：SceneBackfill 没合并成功时给它留了标记，这类场景写进去的元数据下一次合并就没了）
 
 > ⚠️ **冲突警告**：本插件为社区原版 [nfoSceneParser](https://github.com/stashapp/CommunityScripts/tree/main/plugins/nfoSceneParser) 的 fork 版本，**不可与原版同时安装**。如已安装原版，请先卸载原版后再安装本版本，否则会造成插件冲突。
 
@@ -98,6 +98,7 @@ git clone https://github.com/k6cc/nfoSceneParser-jav.git nfoSceneParser
 - 如果未找到 NFO，则使用正则表达式解析文件名中的模式。此回退方案仅在文件名中有一致且可识别的模式时有效。请仔细阅读下方关于如何配置正则表达式的说明。
 - 如果以上均未找到：不做任何操作 ;-)
 - 场景没有文件（binge / stashDiscover 等只写元数据的条目）：没有路径可解析，直接跳过
+- 场景带 `sb_merge_to` 标记（SceneBackfill 没把它合并进原场景，还在等重试）：跳过，写进去的元数据下一次合并就没了
 
 NFO 遵循 KODI 的"影片模板"规范（https://kodi.wiki/view/NFO_files/Movies）。注意：虽然 NFO 结构最初由 KODI 创建，但它已成为视频管理软件的事实标准，如今远超 KODI 本身的用途，被广泛用于存储视频文件的元数据。
 

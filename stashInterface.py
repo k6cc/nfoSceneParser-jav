@@ -45,6 +45,7 @@ class StashInterface:
             date
             rating: rating100
             organized
+            custom_fields
             files {
                 path
             }

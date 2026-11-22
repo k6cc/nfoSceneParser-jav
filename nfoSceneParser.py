@@ -5,11 +5,36 @@ import difflib
 import config
 import log
 import re
+import time
 import unicodedata
 from abstractParser import AbstractParser
 from nfoParser import NfoParser
 from reParser import RegExParser
 from stashInterface import StashInterface
+
+# 跨插件约定（写入方 SceneBackfill）：合并失败的临时场景带 sb_merge_to 标记，
+# 说明它正等着被合并进原场景，写进去的元数据会跟着一起没。
+SB_MERGE_TO = "sb_merge_to"
+SB_MERGE_AT = "sb_merge_at"
+SB_MERGE_TTL = 86400
+
+
+def pending_merge(scene):
+    """Target scene id from SceneBackfill's marker, or None when absent or stale.
+
+    Expires after a day: the marker covers a merge retry window, and a removed
+    SceneBackfill must not freeze the scene forever."""
+    cf = (scene or {}).get("custom_fields") or {}
+    to = cf.get(SB_MERGE_TO)
+    if not to:
+        return None
+    try:
+        stamp = time.mktime(time.strptime(cf.get(SB_MERGE_AT) or "", "%Y-%m-%dT%H:%M:%S"))
+        if time.time() - stamp > SB_MERGE_TTL:
+            return None
+    except Exception:
+        pass
+    return to
 
 
 class NfoSceneParser:
@@ -67,6 +92,12 @@ class NfoSceneParser:
             # 无文件场景（binge / stashDiscover 等只写元数据的条目）：没有路径可解析 nfo / 番号
             log.LogInfo(
                 f"Scene {self._scene['id']} has no file, nothing to parse")
+            return {}
+        if pending_merge(self._scene):
+            # SceneBackfill 没把这个扫描临时场景合并进原场景，它还等着重试；写进去的
+            # 元数据会被下一次合并丢掉，这里不做。
+            log.LogInfo(
+                f"Scene {self._scene['id']} is waiting for a merge, nothing to parse")
             return {}
         if self._scene["organized"] and config.skip_organized:
             log.LogInfo(
