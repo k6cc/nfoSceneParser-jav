@@ -63,6 +63,11 @@ class NfoSceneParser:
     def __parse(self):
         if not self._scene:
             return {}
+        if not self._scene.get("files"):
+            # 无文件场景（binge / stashDiscover 等只写元数据的条目）：没有路径可解析 nfo / 番号
+            log.LogInfo(
+                f"Scene {self._scene['id']} has no file, nothing to parse")
+            return {}
         if self._scene["organized"] and config.skip_organized:
             log.LogInfo(
                 f"Skipping already organized scene id: {self._scene['id']}")

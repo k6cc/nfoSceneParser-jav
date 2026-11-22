@@ -97,6 +97,7 @@ git clone https://github.com/k6cc/nfoSceneParser-jav.git nfoSceneParser
 - 查找匹配的 NFO 文件并解析为场景数据（工作室、演员、日期、名称...）
 - 如果未找到 NFO，则使用正则表达式解析文件名中的模式。此回退方案仅在文件名中有一致且可识别的模式时有效。请仔细阅读下方关于如何配置正则表达式的说明。
 - 如果以上均未找到：不做任何操作 ;-)
+- 场景没有文件（binge / stashDiscover 等只写元数据的条目）：没有路径可解析，直接跳过
 
 NFO 遵循 KODI 的"影片模板"规范（https://kodi.wiki/view/NFO_files/Movies）。注意：虽然 NFO 结构最初由 KODI 创建，但它已成为视频管理软件的事实标准，如今远超 KODI 本身的用途，被广泛用于存储视频文件的元数据。
 

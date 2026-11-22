@@ -93,7 +93,7 @@ class StashInterface:
         if not result or not result.get("findScene"):
             return None
         # Path rewriting used for testing only
-        if (self._path_rewrite is not None):
+        if (self._path_rewrite is not None and result["findScene"].get("files")):
             result["findScene"]["files"][0]["path"] = result["findScene"]["files"][0]["path"].replace(
                 self._path_rewrite[0], self._path_rewrite[1])
         return result.get("findScene")
