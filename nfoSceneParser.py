@@ -12,8 +12,8 @@ from nfoParser import NfoParser
 from reParser import RegExParser
 from stashInterface import StashInterface
 
-# 跨插件约定（写入方 SceneBackfill）：合并失败的临时场景带 sb_merge_to 标记，
-# 说明它正等着被合并进原场景，写进去的元数据会跟着一起没。
+# 跨插件约定（写入方 SceneBackfill）：扫描建出的临时场景在合并失败后会被写上
+# sb_merge_to，意思是它还等着被并进原场景，期间写进去的元数据会随合并一起没。
 SB_MERGE_TO = "sb_merge_to"
 SB_MERGE_AT = "sb_merge_at"
 SB_MERGE_TTL = 86400
@@ -70,20 +70,6 @@ class NfoSceneParser:
         self._folder_data = {}
         self._file_data = {}
 
-    # def __substitute_file_data(self):
-    #     # Nothing to do if no config or actors...
-    #     if not config.performers_substitutions or not self._file_data.get("actors"):
-    #         return
-    #     # Substitute performers names according to config
-    #     index = 0
-    #     for actor in self._file_data.get("actors"):
-    #         for subst in config.performers_substitutions:
-    #             if subst[0].lower() in actor.lower():
-    #                 self._file_data.get("actors")[index] = actor.replace(
-    #                     subst[0], subst[1])
-    #                 break
-    #         index += 1
-
     # Parses data from files. Supports nfo & regex
     def __parse(self):
         if not self._scene:
@@ -94,8 +80,9 @@ class NfoSceneParser:
                 f"Scene {self._scene['id']} has no file, nothing to parse")
             return {}
         if pending_merge(self._scene):
-            # SceneBackfill 没把这个扫描临时场景合并进原场景，它还等着重试；写进去的
-            # 元数据会被下一次合并丢掉，这里不做。
+            # 首次扫描读不到：SceneBackfill 要等 metadataScan 建出临时场景、按文件
+            # 找到它的 id，合并失败后才写标记。挡的是钩子排到合并失败之后才执行
+            # （扫描串行，钩子可能晚于 2~6 秒那次合并）和事后用 reload 标记重跑。
             log.LogInfo(
                 f"Scene {self._scene['id']} is waiting for a merge, nothing to parse")
             return {}
@@ -122,7 +109,6 @@ class NfoSceneParser:
 
         # nfo as preferred input. re as fallback
         self._file_data = nfo_file_data or re_file_data
-        # self.__substitute_file_data()
         return self._file_data
 
     def __strip_b64(self, data):
@@ -269,8 +255,6 @@ class NfoSceneParser:
                         matching_id = performer["id"]
                         match_direct = True
                     match_count += 1
-            # log.LogDebug(
-            #     f"Direct '{actor}' performer search: matching_id: {matching_id}, match_count: {match_count}")
             # 2nd pass for alias matches
             if not matching_id and \
                     config.search_performer_aliases and \
@@ -283,8 +267,6 @@ class NfoSceneParser:
                                 matching_name = performer["name"]
                                 match_alias = True
                             match_count += 1
-                # log.LogDebug(
-                #     f"Aliases '{actor}' performer search: matching_id: {matching_id}, matching_name: {matching_name}, match_count: {match_count}")
             if not matching_id:
                 # Create a new performer when it does not exist
                 if not config.create_missing_performers or config.dry_mode:
