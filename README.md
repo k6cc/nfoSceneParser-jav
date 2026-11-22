@@ -1,6 +1,6 @@
 # nfoSceneParser
 
-> 当前版本 **v1.7.0**（新增 tag 创建失败后「立即再查」兜底：被 tagMergeAuto 等 Tag.Create.Post 钩子合并的新 tag 不再静默丢失，对齐 javstashAutofill+ v1.2.4）
+> 当前版本 **v1.7.1**（修复无文件场景报 IndexError / `exit status 1`：stashDiscover、binge 这类只写元数据的场景没有文件，插件现在直接跳过）
 
 > ⚠️ **冲突警告**：本插件为社区原版 [nfoSceneParser](https://github.com/stashapp/CommunityScripts/tree/main/plugins/nfoSceneParser) 的 fork 版本，**不可与原版同时安装**。如已安装原版，请先卸载原版后再安装本版本，否则会造成插件冲突。
 
